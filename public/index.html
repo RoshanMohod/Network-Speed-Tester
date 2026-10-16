@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Speed Tester · animated</title>
+    <style>
+        /* ---------- GLOBAL RESET & FONTS ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #0b1a2e, #030712);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            animation: bgPulse 12s infinite alternate;
+        }
+
+        @keyframes bgPulse {
+            0% { background: radial-gradient(circle at 20% 30%, #0b1a2e, #030712); }
+            100% { background: radial-gradient(circle at 80% 70%, #112b44, #030b18); }
+        }
+
+        /* ---------- MAIN CARD ---------- */
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: rgba(15, 25, 45, 0.65);
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            border: 1px solid rgba(80, 180, 255, 0.25);
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 30px 45px -20px rgba(0, 180, 255, 0.4), 0 0 0 1px rgba(120, 200, 255, 0.1) inset;
+        }
+
+        /* ---------- HEADER ---------- */
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #c0e4ff, #5ab0ff, #9ad0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 25px rgba(90, 176, 255, 0.6);
+            display: inline-block;
+        }
+
+        header p {
+            color: #8aa9cc;
+            font-size: 1rem;
+            margin-top: 0.3rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        /* ---------- STATUS CARD ---------- */
+        .status-card {
+            background: rgba(8, 20, 36, 0.7);
+            border-radius: 1.5rem;
+            padding: 1.4rem;
+            text-align: center;
+            border: 1px solid rgba(100, 180, 250, 0.25);
+            box-shadow: 0 0 20px rgba(0, 160, 255, 0.1) inset;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-card h2 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #b3d6ff;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        #status {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff5d9;
+            text-shadow: 0 0 12px #ffd966;
+            margin-bottom: 1rem;
+            min-height: 2rem;
+        }
+
+        .test-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .test-btn {
+            padding: 10px 18px;
+            border: 1px solid #2196f3;
+            border-radius: 24px;
+            background: #0b2540;
+            color: #d8ecff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .test-btn-primary {
+            background: #0070f3;
+            border-color: #38bdf8;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(0, 112, 243, 0.5);
+        }
+
+        .test-btn:hover:not(:disabled) {
+            background: #123d63;
+            box-shadow: 0 0 16px #168bff66;
+            transform: translateY(-2px);
+        }
+
+        .test-btn-primary:hover:not(:disabled) {
+            background: #0056b3;
+            box-shadow: 0 0 18px rgba(0, 112, 243, 0.8);
+        }
+
+        .test-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ---------- RESULTS GRID ---------- */
+        .results {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: rgba(12, 28, 48, 0.8);
+            border-radius: 1.5rem;
+            padding: 1.2rem 0.5rem;
+            text-align: center;
+            border: 1px solid rgba(90, 180, 255, 0.3);
+            box-shadow: 0 8px 16px -8px black;
+        }
+
+        .card h3 {
+            font-size: 0.9rem;
+            color: #9ac4ee;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #c2dcff;
+        }
+
+        .card p span {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #b3e0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* ---------- CONNECTION RATING CARD ---------- */
+        .rating-card {
+            background: rgba(8, 20, 36, 0.6);
+            border: 1px solid rgba(80, 180, 255, 0.2);
+            border-radius: 1rem;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .rating-label {
+            font-size: 0.9rem;
+            color: #8aa9cc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rating-badge {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+
+        /* ---------- HISTORY SECTION ---------- */
+        .history-card {
+            background: rgba(8, 20, 36, 0.7);
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            border: 1px solid rgba(80, 180, 255, 0.25);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .history-header h3 {
+            font-size: 1rem;
+            color: #b3d6ff;
+            text-transform: uppercase;
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .btn-clear:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .history-table th {
+            color: #8aa9cc;
+            padding: 8px 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-table td {
+            color: #f0f9ff;
+            padding: 8px 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ---------- FOOTER ---------- */
+        footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: #3e5f7a;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 650px) {
+            .results {
+                grid-template-columns: 1fr 1fr;
+            }
+            .rating-card {
+                flex-direction: column;
+                gap: 6px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Network Speed Tester</h1>
+            <p>Measure your network performance</p>
+        </header>
+
+        <main>
+            <section class="status-card">
+                <h2>Connection Status</h2>
+                <p id="status">Ready to test</p>
+
+                <div class="test-buttons">
+                    <button id="fullTestBtn" class="test-btn test-btn-primary">▶ Run Full Test</button>
+                    <button id="pingBtn" class="test-btn">Test Latency</button>
+                    <button id="downloadBtn" class="test-btn">Test Download</button>
+                    <button id="uploadBtn" class="test-btn">Test Upload</button>
+                </div>
+            </section>
+
+            <section class="results">
+                <div class="card">
+                    <h3>Download Speed</h3>
+                    <p><span id="download">--</span> Mbps</p>
+                </div>
+
+                <div class="card">
+                    <h3>Upload Speed</h3>
+                    <p><span id="upload">--</span> Mbps</p>
+                </div>
+
+                <div class="card">
+                    <h3>Latency</h3>
+                    <p><span id="latency">--</span> ms</p>
+                </div>
+
+                <div class="card">
+                    <h3>Jitter</h3>
+                    <p><span id="jitter">--</span> ms</p>
+                </div>
+            </section>
+
+            <!-- Quality Rating -->
+            <div class="rating-card">
+                <span class="rating-label">Quality Assessment:</span>
+                <span id="ratingBadge" class="rating-badge">Awaiting Test</span>
+            </div>
+
+            <!-- Test History -->
+            <section class="history-card">
+                <div class="history-header">
+                    <h3>Test History</h3>
+                    <button id="clearHistoryBtn" class="btn-clear">Clear Records</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Latency</th>
+                                <th>Jitter</th>
+                                <th>Download</th>
+                                <th>Upload</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr>
+                                <td colspan="6" style="color: #64748b;">No test history yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Computer Networks Mini Project</p>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            const statusEl = document.getElementById('status');
+            const fullTestBtn = document.getElementById('fullTestBtn');
+            const pingBtn = document.getElementById('pingBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+            const latencyEl = document.getElementById('latency');
+            const jitterEl = document.getElementById('jitter');
+            const downloadEl = document.getElementById('download');
+            const uploadEl = document.getElementById('upload');
+            const ratingBadge = document.getElementById('ratingBadge');
+            const historyBody = document.getElementById('historyBody');
+
+            function setButtonsDisabled(state) {
+                fullTestBtn.disabled = state;
+                pingBtn.disabled = state;
+                downloadBtn.disabled = state;
+                uploadBtn.disabled = state;
+            }
+
+            // 1. LATENCY & JITTER
+            async function measureLatencyAndJitter() {
+                const pingCount = 5;
+                const latencies = [];
+
+                for (let i = 0; i < pingCount; i++) {
+                    statusEl.textContent = `Pinging server... (${i + 1}/${pingCount})`;
+
+                    const start = performance.now();
+                    const response = await fetch(`/api/ping?t=${Date.now()}_${i}`, { cache: 'no-store' });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    await response.json();
+                    const end = performance.now();
+
+                    const rtt = end - start;
+                    latencies.push(rtt);
+                    latencyEl.textContent = Math.round(rtt);
+                    await new Promise(r => setTimeout(r, 60));
+                }
+
+                const avgLatency = Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length);
+                latencyEl.textContent = avgLatency;
+
+                let totalJitter = 0;
+                for (let i = 1; i < latencies.length; i++) {
+                    totalJitter += Math.abs(latencies[i] - latencies[i - 1]);
+                }
+                const jitter = Math.round(totalJitter / (latencies.length - 1));
+                jitterEl.textContent = jitter;
+
+                return { avgLatency, jitter };
+            }
+
+            // 2. DOWNLOAD SPEED
+            async function measureDownload() {
+                statusEl.textContent = 'Measuring download speed...';
+                downloadEl.textContent = '...';
+
+                const requestedBytes = 5000000; // 5 MB
+                const startTime = performance.now();
+                const response = await fetch(`/api/download?bytes=${requestedBytes}&t=${Date.now()}`, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const reader = response.body.getReader();
+                let receivedBytes = 0;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    receivedBytes += value.length;
+                }
+
+                const endTime = performance.now();
+                const durationSeconds = (endTime - startTime) / 1000;
+                const speedMbps = ((receivedBytes * 8) / (durationSeconds * 1000000)).toFixed(2);
+                downloadEl.textContent = speedMbps;
+
+                return speedMbps;
+            }
+
+            // 3. UPLOAD SPEED
+            async function measureUpload() {
+                statusEl.textContent = 'Measuring upload speed...';
+                uploadEl.textContent = '...';
+
+                const uploadBytes = 4 * 1024 * 1024; // 4 MB
+                const payload = new Uint8Array(uploadBytes);
+
+                const startTime = performance.now();
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/octet-stream' },
+                    body: payload
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                await response.json();
+
+                const endTime = performance.now();
+                const durationSeconds = (endTime - startTime) / 1000;
+                const speedMbps = ((uploadBytes * 8) / (durationSeconds * 1000000)).toFixed(2);
+                uploadEl.textContent = speedMbps;
+
+                return speedMbps;
+            }
+
+            // 4. CONNECTION QUALITY EVALUATOR
+            function getQualityRating(lat, jit, down) {
+                if (lat < 30 && jit < 8 && down > 30) return 'Optimal (Gaming / 4K)';
+                if (lat < 70 && jit < 20 && down > 15) return 'Good (HD Streaming / Calls)';
+                if (lat < 150 && down > 5) return 'Moderate (Browsing)';
+                return 'Poor / Unstable Link';
+            }
+
+            // 5. LOCAL STORAGE HISTORY
+            function saveResult(lat, jit, down, up, rating) {
+                const history = JSON.parse(localStorage.getItem('speed_test_history') || '[]');
+                const newRecord = {
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                    latency: `${lat} ms`,
+                    jitter: `${jit} ms`,
+                    download: `${down} Mbps`,
+                    upload: `${up} Mbps`,
+                    rating
+                };
+                history.unshift(newRecord);
+                if (history.length > 5) history.pop(); // Keep 5 most recent
+                localStorage.setItem('speed_test_history', JSON.stringify(history));
+                renderHistory();
+            }
+
+            function renderHistory() {
+                const history = JSON.parse(localStorage.getItem('speed_test_history') || '[]');
+                if (history.length === 0) {
+                    historyBody.innerHTML = '<tr><td colspan="6" style="color: #64748b;">No test history yet.</td></tr>';
+                    return;
+                }
+                historyBody.innerHTML = history.map(item => `
+                    <tr>
+                        <td>${item.time}</td>
+                        <td>${item.latency}</td>
+                        <td>${item.jitter}</td>
+                        <td>${item.download}</td>
+                        <td>${item.upload}</td>
+                        <td style="color: #38bdf8;">${item.rating}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // FULL TEST SEQUENCER
+            async function runFullTest() {
+                setButtonsDisabled(true);
+                try {
+                    const { avgLatency, jitter } = await measureLatencyAndJitter();
+                    const down = await measureDownload();
+                    const up = await measureUpload();
+
+                    const rating = getQualityRating(avgLatency, jitter, parseFloat(down));
+                    ratingBadge.textContent = rating;
+
+                    saveResult(avgLatency, jitter, down, up, rating);
+                    statusEl.textContent = 'All diagnostics complete ✓';
+                } catch (err) {
+                    console.error(err);
+                    statusEl.textContent = 'Diagnostic interrupted';
+                } finally {
+                    setButtonsDisabled(false);
+                }
+            }
+
+            // EVENT LISTENERS
+            fullTestBtn.addEventListener('click', runFullTest);
+            pingBtn.addEventListener('click', async () => {
+                setButtonsDisabled(true);
+                try {
+                    await measureLatencyAndJitter();
+                    statusEl.textContent = 'Latency test complete ✓';
+                } catch (e) {
+                    statusEl.textContent = 'Latency failed';
+                } finally {
+                    setButtonsDisabled(false);
+                }
+            });
+
+            downloadBtn.addEventListener('click', async () => {
+                setButtonsDisabled(true);
+                try {
+                    await measureDownload();
+                    statusEl.textContent = 'Download complete ✓';
+                } catch (e) {
+                    statusEl.textContent = 'Download failed';
+                } finally {
+                    setButtonsDisabled(false);
+                }
+            });
+
+            uploadBtn.addEventListener('click', async () => {
+                setButtonsDisabled(true);
+                try {
+                    await measureUpload();
+                    statusEl.textContent = 'Upload complete ✓';
+                } catch (e) {
+                    statusEl.textContent = 'Upload failed';
+                } finally {
+                    setButtonsDisabled(false);
+                }
+            });
+
+            clearHistoryBtn.addEventListener('click', () => {
+                localStorage.removeItem('speed_test_history');
+                renderHistory();
+            });
+
+            // Initialize table on load
+            renderHistory();
+        })();
+    </script>
+</body>
+</html>
